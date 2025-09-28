@@ -28,10 +28,7 @@ func main() {
 	logger.SetLevel(logrus.InfoLevel)
 	logger.SetFormatter(&logrus.JSONFormatter{})
 
-	marketDataService := services.NewMarketDataService(logger)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	marketDataService := services.NewMarketDataService(cfg, logger)
 
 	grpcServer := setupGRPCServer(cfg, marketDataService, logger)
 	httpServer := setupHTTPServer(cfg, marketDataService, logger)

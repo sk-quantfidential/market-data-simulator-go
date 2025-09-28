@@ -2,14 +2,18 @@ package services
 
 import (
 	"github.com/sirupsen/logrus"
+
+	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/config"
 )
 
 type MarketDataService struct {
+	config *config.Config
 	logger *logrus.Logger
 }
 
-func NewMarketDataService(logger *logrus.Logger) *MarketDataService {
+func NewMarketDataService(cfg *config.Config, logger *logrus.Logger) *MarketDataService {
 	return &MarketDataService{
+		config: cfg,
 		logger: logger,
 	}
 }
