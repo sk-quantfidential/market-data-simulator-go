@@ -1,0 +1,149 @@
+syntax = "proto3";
+
+package marketdata;
+
+option go_package = "github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/proto";
+
+import "google/protobuf/timestamp.proto";
+
+// Market Data Service for simulation and streaming
+service MarketDataService {
+    // Get current price for a symbol
+    rpc GetPrice(GetPriceRequest) returns (GetPriceResponse);
+
+    // Subscribe to real-time price stream
+    rpc StreamPrices(StreamPricesRequest) returns (stream PriceUpdate);
+
+    // Generate simulated market data based on real data
+    rpc GenerateSimulation(SimulationRequest) returns (SimulationResponse);
+
+    // Stream simulated scenarios (rally, crash, divergence, etc.)
+    rpc StreamScenario(ScenarioRequest) returns (stream PriceUpdate);
+
+    // Health check
+    rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message GetPriceRequest {
+    string symbol = 1;
+}
+
+message GetPriceResponse {
+    string symbol = 1;
+    double price = 2;
+    google.protobuf.Timestamp timestamp = 3;
+    string source = 4;
+}
+
+message StreamPricesRequest {
+    repeated string symbols = 1;
+    int32 update_interval_ms = 2; // milliseconds
+}
+
+message PriceUpdate {
+    string symbol = 1;
+    double price = 2;
+    double volume = 3;
+    google.protobuf.Timestamp timestamp = 4;
+    string source = 5;
+    PriceChangeInfo change_info = 6;
+}
+
+message PriceChangeInfo {
+    double change_amount = 1;
+    double change_percentage = 2;
+    double daily_high = 3;
+    double daily_low = 4;
+    double daily_volume = 5;
+}
+
+message SimulationRequest {
+    string symbol = 1;
+    google.protobuf.Timestamp start_time = 2;
+    google.protobuf.Timestamp end_time = 3;
+    SimulationType simulation_type = 4;
+    SimulationParameters parameters = 5;
+}
+
+message SimulationResponse {
+    string symbol = 1;
+    repeated PricePoint historical_data = 2;
+    repeated PricePoint simulated_data = 3;
+    StatisticalMetrics similarity_metrics = 4;
+    string simulation_id = 5;
+}
+
+message ScenarioRequest {
+    string symbol = 1;
+    ScenarioType scenario_type = 2;
+    ScenarioParameters parameters = 3;
+    google.protobuf.Timestamp start_time = 4;
+    int32 duration_minutes = 5;
+}
+
+message PricePoint {
+    google.protobuf.Timestamp timestamp = 1;
+    double open = 2;
+    double high = 3;
+    double low = 4;
+    double close = 5;
+    double volume = 6;
+}
+
+message StatisticalMetrics {
+    double correlation_coefficient = 1;
+    double volatility_similarity = 2;
+    double return_distribution_similarity = 3;
+    double trend_similarity = 4;
+    double confidence_score = 5;
+}
+
+message SimulationParameters {
+    double volatility_factor = 1;
+    double trend_factor = 2;
+    int32 data_points = 3;
+    bool include_noise = 4;
+    double noise_level = 5;
+}
+
+message ScenarioParameters {
+    double intensity = 1; // 0.1 to 2.0
+    double duration_factor = 2; // How long the scenario lasts
+    double recovery_factor = 3; // How quickly it recovers
+    bool gradual_transition = 4; // Gradual vs sudden onset
+}
+
+message HealthCheckRequest {
+    string service = 1;
+}
+
+message HealthCheckResponse {
+    HealthStatus status = 1;
+    string message = 2;
+    google.protobuf.Timestamp timestamp = 3;
+    map<string, string> details = 4;
+}
+
+enum SimulationType {
+    STATISTICAL_SIMILARITY = 0;
+    MONTE_CARLO = 1;
+    BROWNIAN_MOTION = 2;
+    MEAN_REVERSION = 3;
+    TREND_FOLLOWING = 4;
+}
+
+enum ScenarioType {
+    RALLY = 0;
+    CRASH = 1;
+    DIVERGENCE = 2;
+    MEAN_REVERTING = 3;
+    VOLATILITY_SPIKE = 4;
+    CONSOLIDATION = 5;
+}
+
+enum HealthStatus {
+    UNKNOWN = 0;
+    SERVING = 1;
+    NOT_SERVING = 2;
+    SERVICE_UNKNOWN = 3;
+}

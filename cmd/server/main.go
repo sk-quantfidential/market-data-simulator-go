@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,12 +11,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/health"
-	"google.golang.org/grpc/health/grpc_health_v1"
 
 	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/config"
 	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/handlers"
+	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/infrastructure"
+	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/proto"
 	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/services"
 )
 
@@ -30,12 +28,16 @@ func main() {
 
 	marketDataService := services.NewMarketDataService(cfg, logger)
 
-	grpcServer := setupGRPCServer(cfg, marketDataService, logger)
+	// Create enhanced gRPC server with market data service
+	grpcServer := infrastructure.NewMarketDataGRPCServer(cfg, marketDataService, logger)
+	marketDataHandler := handlers.NewMarketDataGRPCHandler(cfg, marketDataService, logger)
+	proto.RegisterMarketDataServiceServer(grpcServer.GetGRPCServer(), marketDataHandler)
+
 	httpServer := setupHTTPServer(cfg, marketDataService, logger)
 
 	go func() {
-		logger.WithField("port", cfg.GRPCPort).Info("Starting gRPC server")
-		if err := startGRPCServer(grpcServer, cfg.GRPCPort); err != nil {
+		logger.WithField("port", cfg.GRPCPort).Info("Starting enhanced gRPC server")
+		if err := grpcServer.Start(); err != nil {
 			logger.WithError(err).Fatal("Failed to start gRPC server")
 		}
 	}()
@@ -60,19 +62,10 @@ func main() {
 		logger.WithError(err).Error("HTTP server forced to shutdown")
 	}
 
-	grpcServer.GracefulStop()
+	grpcServer.Stop()
 	logger.Info("Servers shutdown complete")
 }
 
-func setupGRPCServer(cfg *config.Config, marketDataService *services.MarketDataService, logger *logrus.Logger) *grpc.Server {
-	server := grpc.NewServer()
-
-	healthServer := health.NewServer()
-	grpc_health_v1.RegisterHealthServer(server, healthServer)
-	healthServer.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
-
-	return server
-}
 
 func setupHTTPServer(cfg *config.Config, marketDataService *services.MarketDataService, logger *logrus.Logger) *http.Server {
 	router := gin.New()
@@ -92,10 +85,3 @@ func setupHTTPServer(cfg *config.Config, marketDataService *services.MarketDataS
 	}
 }
 
-func startGRPCServer(server *grpc.Server, port int) error {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-	if err != nil {
-		return err
-	}
-	return server.Serve(lis)
-}
