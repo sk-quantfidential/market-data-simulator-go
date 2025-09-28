@@ -1,6 +1,6 @@
 module github.com/quantfidential/trading-ecosystem/market-data-simulator-go
 
-go 1.21
+go 1.24
 
 require (
 	google.golang.org/grpc v1.58.3

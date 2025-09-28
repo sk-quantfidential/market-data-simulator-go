@@ -19,18 +19,31 @@
 ---
 
 ### 🔗 Milestone TSE-0001.3b: Go Services gRPC Integration
-**Status**: Not Started
+**Status**: Phase 1 in Progress (Following proven pattern from custodian-simulator-go & exchange-simulator-go)
 **Priority**: High
 
-**Tasks**:
-- [ ] Implement gRPC server with health service
-- [ ] Service registration with Redis-based discovery
-- [ ] Configuration service client integration
-- [ ] Inter-service communication testing
+**Tasks** (Following proven TDD Red-Green-Refactor cycle):
+- [ ] **Phase 1: TDD Red** - Create failing tests for market data gRPC integration with simulation behaviors
+- [ ] **Phase 2: Infrastructure** - Add Redis dependencies and update .gitignore for Go projects
+- [ ] **Phase 3: gRPC Server** - Enhanced server with health service, market data streaming, and metrics
+- [ ] **Phase 4: Configuration** - Configuration service client with HTTP caching, TTL, and market data parameters
+- [ ] **Phase 5: Discovery** - Service discovery with Redis-based registry, heartbeat, and cleanup
+- [ ] **Phase 6: Communication** - Inter-service client manager with connection pooling and circuit breaker
+- [ ] **Phase 7: Integration** - Comprehensive testing with market data scenarios and smart infrastructure detection
+- [ ] **Phase 8: Validation** - Verify BDD acceptance and complete milestone documentation
 
-**BDD Acceptance**: Go services can discover and communicate with each other via gRPC
+**Implementation Pattern** (Replicating proven success from other Go components):
+- **Infrastructure Layer**: Configuration client, service discovery, gRPC clients
+- **Presentation Layer**: Enhanced gRPC server with health service and market data streaming
+- **Domain Layer**: Market data simulation engine with real data integration capability
+- **Testing Strategy**: Unit tests with smart dependency skipping, integration tests for market data scenarios
+- **Market Data Features**: Statistical similarity, scenario simulation (rally/crash/divergence/reverting), standard API
+
+**BDD Acceptance**: Go services can discover and communicate with each other via gRPC, with market data streaming capabilities
 
 **Dependencies**: TSE-0001.1a (Go Services Bootstrapping), TSE-0001.3a (Core Infrastructure)
+
+**Reference Implementation**: custodian-simulator-go & exchange-simulator-go (✅ COMPLETED) - Use as pattern for architecture and testing
 
 ---
 
