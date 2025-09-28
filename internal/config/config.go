@@ -6,18 +6,22 @@ import (
 )
 
 type Config struct {
-	HTTPPort int
-	GRPCPort int
-	LogLevel string
-	RedisURL string
+	ServiceName    string
+	ServiceVersion string
+	HTTPPort       int
+	GRPCPort       int
+	LogLevel       string
+	RedisURL       string
 }
 
 func Load() *Config {
 	return &Config{
-		HTTPPort: getEnvAsInt("HTTP_PORT", 8080),
-		GRPCPort: getEnvAsInt("GRPC_PORT", 9090),
-		LogLevel: getEnv("LOG_LEVEL", "info"),
-		RedisURL: getEnv("REDIS_URL", "redis://localhost:6379"),
+		ServiceName:    getEnv("SERVICE_NAME", "market-data-simulator"),
+		ServiceVersion: getEnv("SERVICE_VERSION", "1.0.0"),
+		HTTPPort:       getEnvAsInt("HTTP_PORT", 8080),
+		GRPCPort:       getEnvAsInt("GRPC_PORT", 9090),
+		LogLevel:       getEnv("LOG_LEVEL", "info"),
+		RedisURL:       getEnv("REDIS_URL", "redis://localhost:6379"),
 	}
 }
 
