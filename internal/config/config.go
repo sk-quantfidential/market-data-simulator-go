@@ -35,8 +35,8 @@ func Load() *Config {
 	return &Config{
 		ServiceName:             getEnv("SERVICE_NAME", "market-data-simulator"),
 		ServiceVersion:          getEnv("SERVICE_VERSION", "1.0.0"),
-		HTTPPort:                getEnvAsInt("HTTP_PORT", 8083),
-		GRPCPort:                getEnvAsInt("GRPC_PORT", 9093),
+		HTTPPort:                getEnvAsInt("HTTP_PORT", 8080),
+		GRPCPort:                getEnvAsInt("GRPC_PORT", 50051),
 		LogLevel:                getEnv("LOG_LEVEL", "info"),
 		PostgresURL:             getEnv("POSTGRES_URL", ""),
 		RedisURL:                getEnv("REDIS_URL", "redis://localhost:6379"),
