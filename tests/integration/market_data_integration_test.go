@@ -18,24 +18,24 @@ import (
 )
 
 type IntegrationTestSuite struct {
-	config                *config.Config
-	logger                *logrus.Logger
-	serviceDiscovery      *infrastructure.ServiceDiscovery
-	configClient          *infrastructure.ConfigurationClient
-	clientManager         *infrastructure.InterServiceClientManager
-	grpcServer            *infrastructure.MarketDataGRPCServer
-	marketDataService     *services.MarketDataService
-	marketDataHandler     *handlers.MarketDataGRPCHandler
+	config            *config.Config
+	logger            *logrus.Logger
+	serviceDiscovery  *infrastructure.ServiceDiscovery
+	configClient      *infrastructure.ConfigurationClient
+	clientManager     *infrastructure.InterServiceClientManager
+	grpcServer        *infrastructure.MarketDataGRPCServer
+	marketDataService *services.MarketDataService
+	marketDataHandler *handlers.MarketDataGRPCHandler
 }
 
 func setupIntegrationTest(t *testing.T) (*IntegrationTestSuite, func()) {
 	cfg := &config.Config{
 		ServiceName:    "market-data-simulator",
 		ServiceVersion: "1.0.0",
-		GRPCPort:      9090,
-		HTTPPort:      8080,
-		LogLevel:      "info",
-		RedisURL:      "redis://localhost:6379",
+		GRPCPort:       50051,
+		HTTPPort:       8080,
+		LogLevel:       "info",
+		RedisURL:       "redis://localhost:6379",
 	}
 
 	logger := logrus.New()
@@ -86,7 +86,7 @@ func TestIntegrationSuite_ComponentInitialization(t *testing.T) {
 	// Verify configuration
 	assert.Equal(t, "market-data-simulator", suite.config.ServiceName)
 	assert.Equal(t, "1.0.0", suite.config.ServiceVersion)
-	assert.Equal(t, 9090, suite.config.GRPCPort)
+	assert.Equal(t, 50051, suite.config.GRPCPort)
 	assert.Equal(t, 8080, suite.config.HTTPPort)
 }
 
@@ -294,7 +294,7 @@ func TestIntegrationSuite_StatisticalSimilarityValidation(t *testing.T) {
 				// Simulated prices shouldn't deviate too much from historical
 				if i < len(resp.HistoricalData) {
 					historical := resp.HistoricalData[i]
-					deviation := abs(point.Close - historical.Close) / historical.Close
+					deviation := abs(point.Close-historical.Close) / historical.Close
 					assert.Less(t, deviation, 0.5) // Max 50% deviation
 				}
 			}

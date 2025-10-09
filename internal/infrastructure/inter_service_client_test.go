@@ -15,9 +15,9 @@ func setupInterServiceClientManager() (*InterServiceClientManager, *ServiceDisco
 	cfg := &config.Config{
 		ServiceName:    "market-data-simulator",
 		ServiceVersion: "1.0.0",
-		GRPCPort:      9090,
-		HTTPPort:      8080,
-		RedisURL:      "redis://localhost:6379",
+		GRPCPort:       50051,
+		HTTPPort:       8080,
+		RedisURL:       "redis://localhost:6379",
 	}
 
 	logger := logrus.New()

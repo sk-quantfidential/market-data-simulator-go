@@ -19,10 +19,10 @@ func setupHandler() *MarketDataGRPCHandler {
 	cfg := &config.Config{
 		ServiceName:    "market-data-simulator",
 		ServiceVersion: "1.0.0",
-		GRPCPort:      9090,
-		HTTPPort:      8080,
-		LogLevel:      "info",
-		RedisURL:      "redis://localhost:6379",
+		GRPCPort:       50051,
+		HTTPPort:       8080,
+		LogLevel:       "info",
+		RedisURL:       "redis://localhost:6379",
 	}
 
 	logger := logrus.New()
@@ -248,10 +248,10 @@ func TestMarketDataGRPCHandler_GenerateScenarioPrice(t *testing.T) {
 
 	for _, scenario := range scenarios {
 		params := &proto.ScenarioParameters{
-			Intensity:          1.5,
-			DurationFactor:     1.0,
-			RecoveryFactor:     0.5,
-			GradualTransition:  true,
+			Intensity:         1.5,
+			DurationFactor:    1.0,
+			RecoveryFactor:    0.5,
+			GradualTransition: true,
 		}
 
 		update := handler.generateScenarioPrice("TEST/USD", scenario, params, basePrice, currentTime, startTime, endTime)
