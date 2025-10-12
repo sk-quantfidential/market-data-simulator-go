@@ -177,7 +177,7 @@
 - Enhanced Config struct with DataAdapter integration
 - Implemented InitializeDataAdapter, GetDataAdapter, DisconnectDataAdapter methods
 - Added godotenv for .env file loading
-- Updated ports to 8083 (HTTP), 9093 (gRPC) to avoid conflicts
+- Updated ports to 8080 (HTTP), 50051 (gRPC) to avoid conflicts
 
 **Smoke Tests**: ✅ (3/3 passing)
 - Config load tests with defaults and environment variables ✅
