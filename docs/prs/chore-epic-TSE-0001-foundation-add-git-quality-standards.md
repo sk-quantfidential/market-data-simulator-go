@@ -20,7 +20,7 @@ Establish consistent git workflow quality standards across all repositories in t
 - Consistent code quality and formatting
 - Automated validation in CI/CD
 
-## Changes
+## What Changed
 
 ### Plugin Architecture
 ```
