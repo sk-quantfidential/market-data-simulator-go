@@ -102,7 +102,7 @@ All 6 validation checks passing:
 
 **Breaking Changes**: None
 
-**Dependencies**: 
+**Dependencies**:
 - markdownlint-cli (optional, for markdown linting)
 - GitHub Actions (optional, for CI/CD validation)
 
