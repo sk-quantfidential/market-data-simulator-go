@@ -29,9 +29,8 @@ profile.cov
 vendor/
 
 # Build artifacts
-custodian-simulator
-/custodian-simulator
-server
+market-data-simulator
+/market-data-simulator
 
 # Environment files (DO NOT COMMIT SECRETS)
 .env
