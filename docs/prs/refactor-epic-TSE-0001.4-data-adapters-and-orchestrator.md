@@ -117,7 +117,7 @@ Created 3 test suites validating config integration:
 --- PASS: TestConfig_DataAdapterInitialization (134.79s)
 
 PASS
-ok  	github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/config	134.793s
+ok   github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/config 134.793s
 ```
 
 ### Phase 3: Environment Configuration (Task 5)
