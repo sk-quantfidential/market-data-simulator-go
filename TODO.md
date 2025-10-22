@@ -117,7 +117,7 @@
 **Goal**: Ensure existing test infrastructure is ready for DataAdapter integration
 **Estimated Time**: 30 minutes
 
-#### Steps:
+#### Steps
 - [ ] Verify Makefile has test automation targets (unit, integration, all)
 - [ ] Ensure go.mod compiles successfully
 - [ ] Confirm no JSON serialization issues (use `json.RawMessage` for metadata fields)
@@ -172,7 +172,7 @@ This task creates the foundation data adapter repository. See `market-data-adapt
 **Goal**: Replace direct database access with market-data-adapter-go repositories
 **Estimated Time**: 2 hours
 
-#### Files to Modify:
+#### Files to Modify
 
 **internal/infrastructure/service_discovery.go**:
 - Replace direct Redis access with `DataAdapter.ServiceDiscoveryRepository`
@@ -198,7 +198,7 @@ This task creates the foundation data adapter repository. See `market-data-adapt
 - Add cleanup in shutdown: `defer config.GetDataAdapter().Disconnect(ctx)`
 - Verify lifecycle management (Connect → Use → Disconnect)
 
-#### go.mod Updates:
+#### go.mod Updates
 ```go
 require (
     github.com/quantfidential/trading-ecosystem/market-data-adapter-go v0.1.0
@@ -234,7 +234,7 @@ echo $?  # Should be 0
 **Goal**: Integrate market data domain operations with repository patterns
 **Estimated Time**: 2-3 hours
 
-#### Files to Modify/Create:
+#### Files to Modify/Create
 
 **internal/services/market_data.go**:
 ```go
@@ -378,7 +378,7 @@ go test ./internal/handlers/... -v
 **Goal**: Enable tests to use shared orchestrator services
 **Estimated Time**: 1 hour
 
-#### Create .env.example:
+#### Create .env.example
 ```bash
 # Market Data Simulator Configuration
 # Copy this to .env and update with your orchestrator credentials
@@ -432,7 +432,7 @@ LOG_LEVEL=info
 LOG_FORMAT=json
 ```
 
-#### Update Makefile:
+#### Update Makefile
 ```makefile
 .PHONY: test test-unit test-integration test-all check-env
 
@@ -443,31 +443,31 @@ ifneq (,$(wildcard .env))
 endif
 
 check-env:
-	@if [ ! -f .env ]; then \
-		echo "Warning: .env not found. Copy .env.example to .env"; \
-		exit 1; \
-	fi
+ @if [ ! -f .env ]; then \
+  echo "Warning: .env not found. Copy .env.example to .env"; \
+  exit 1; \
+ fi
 
 test-unit:
-	@if [ -f .env ]; then set -a && . ./.env && set +a; fi && \
-	go test ./internal/... -v -short
+ @if [ -f .env ]; then set -a && . ./.env && set +a; fi && \
+ go test ./internal/... -v -short
 
 test-integration: check-env
-	@set -a && . ./.env && set +a && \
-	go test ./tests/... -v
+ @set -a && . ./.env && set +a && \
+ go test ./tests/... -v
 
 test-all: check-env
-	@set -a && . ./.env && set +a && \
-	go test ./... -v
+ @set -a && . ./.env && set +a && \
+ go test ./... -v
 
 build:
-	go build -v ./...
+ go build -v ./...
 
 clean:
-	go clean -testcache
+ go clean -testcache
 ```
 
-#### Update .gitignore:
+#### Update .gitignore
 ```
 # Environment files (security)
 .env
@@ -488,7 +488,7 @@ coverage.html
 market-data-simulator
 ```
 
-#### Add godotenv to go.mod:
+#### Add godotenv to go.mod
 ```bash
 go get github.com/joho/godotenv@v1.5.1
 ```
@@ -548,7 +548,7 @@ go run cmd/server/main.go
 **Goal**: Package market-data-simulator-go for orchestrator deployment
 **Estimated Time**: 1 hour
 
-#### Update Dockerfile:
+#### Update Dockerfile
 
 ```dockerfile
 # Multi-stage build for market-data-simulator
