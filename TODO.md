@@ -47,6 +47,103 @@
 
 ---
 
+### 📊 Milestone TSE-0001.12b: Prometheus Metrics Client
+**Status**: ✅ **COMPLETE** - Clean Architecture metrics implementation with BDD testing
+**Goal**: Implement Prometheus metrics collection for observability using Clean Architecture patterns
+**Pattern**: Following audit-correlator-go, custodian-simulator-go, and exchange-simulator-go proven approach
+**Dependencies**: TSE-0001.3b (Go Services gRPC Integration) ✅
+**Completed**: 2025-10-09
+
+## ✅ What Was Completed
+
+**Domain Layer** (Clean Architecture): ✅
+- Created `MetricsPort` interface in `internal/domain/ports/metrics.go`
+- Port abstraction enables future OpenTelemetry migration
+- Zero infrastructure dependencies in domain layer
+
+**Infrastructure Layer** (Prometheus Adapter): ✅
+- Implemented `PrometheusMetricsAdapter` in `internal/infrastructure/observability/prometheus_adapter.go`
+- Thread-safe lazy initialization with double-check locking pattern
+- Separate Prometheus registry with Go runtime metrics
+- Constant labels: service, instance, version
+- Histogram buckets optimized for HTTP API latency (5ms to 10s)
+- Dynamic metric registration (counters, histograms, gauges)
+
+**Middleware** (RED Pattern): ✅
+- Implemented `REDMetricsMiddleware` in `internal/infrastructure/observability/middleware.go`
+- RED metrics: Rate (http_requests_total), Errors (http_request_errors_total), Duration (http_request_duration_seconds)
+- Low cardinality labels: method, route pattern (not path), status code
+- Unknown routes labeled as "unknown" to prevent metric explosion
+
+**Presentation Layer** (Handler): ✅
+- Created `MetricsHandler` in `internal/handlers/metrics.go`
+- Exposes `/metrics` endpoint via MetricsPort interface
+- Clean separation between business logic and observability
+
+**Integration** (main.go): ✅
+- Added observability initialization in `cmd/server/main.go`
+- Metrics middleware applied to all HTTP routes
+- `/metrics` endpoint exposed at root level
+- Dependency injection following Clean Architecture
+
+**Dependencies** (go.mod): ✅
+- Added `github.com/prometheus/client_golang v1.23.2`
+- All required Prometheus dependencies resolved
+
+**BDD Testing** (8 scenarios, 8/8 passing): ✅
+- **Handler Tests** (`internal/handlers/metrics_test.go`):
+  - ✅ exposes_prometheus_metrics_through_port
+  - ✅ returns_text_plain_content_type
+  - ✅ includes_standard_go_runtime_metrics
+  - ✅ includes_constant_labels_in_all_metrics
+
+- **Middleware Tests** (`internal/infrastructure/observability/middleware_test.go`):
+  - ✅ instruments_successful_requests_with_RED_metrics
+  - ✅ instruments_error_requests_with_error_counter
+  - ✅ uses_route_pattern_not_full_path
+  - ✅ handles_unknown_routes_without_metric_explosion
+
+## 📈 Metrics Exposed
+
+**RED Pattern Metrics**:
+- `http_requests_total{method, route, code, service, instance, version}` - Total HTTP requests
+- `http_request_duration_seconds{method, route, code, service, instance, version}` - Request latency histogram
+- `http_request_errors_total{method, route, code, service, instance, version}` - HTTP errors (4xx/5xx)
+
+**Go Runtime Metrics**:
+- `go_goroutines` - Current goroutine count
+- `go_memstats_alloc_bytes` - Memory allocation
+- `go_threads` - OS thread count
+- `process_cpu_seconds_total` - CPU usage
+
+## 🎯 BDD Acceptance Criteria
+> market-data-simulator-go exposes Prometheus metrics at /metrics endpoint with RED pattern instrumentation
+
+**Status**: ✅ Complete - All 8 BDD scenarios passing
+
+## 📝 Files Modified/Created
+
+**Created**:
+- `internal/domain/ports/metrics.go` - MetricsPort interface (Clean Architecture)
+- `internal/infrastructure/observability/prometheus_adapter.go` - Prometheus implementation (206 lines)
+- `internal/infrastructure/observability/middleware.go` - RED metrics middleware (77 lines)
+- `internal/handlers/metrics.go` - Metrics endpoint handler (29 lines)
+- `internal/handlers/metrics_test.go` - Handler BDD tests (179 lines, 4 scenarios)
+- `internal/infrastructure/observability/middleware_test.go` - Middleware BDD tests (228 lines, 4 scenarios)
+
+**Modified**:
+- `cmd/server/main.go` - Added metrics initialization and middleware
+- `go.mod` - Added Prometheus dependencies
+- `go.sum` - Dependency checksums
+
+## 🔒 Low Cardinality Best Practices
+✅ Route patterns used (not full paths): `/api/v1/prices/:symbol` not `/api/v1/prices/BTC`
+✅ Unknown routes grouped as "unknown"
+✅ Limited label values (method, route pattern, code)
+✅ No user-provided data in labels
+
+---
+
 ### 📊 Milestone TSE-0001.5: Market Data Foundation (PRIMARY)
 **Status**: Not Started
 **Priority**: CRITICAL - Enables trading and risk monitoring
@@ -80,7 +177,7 @@
 - Enhanced Config struct with DataAdapter integration
 - Implemented InitializeDataAdapter, GetDataAdapter, DisconnectDataAdapter methods
 - Added godotenv for .env file loading
-- Updated ports to 8083 (HTTP), 9093 (gRPC) to avoid conflicts
+- Updated ports to 8080 (HTTP), 50051 (gRPC) to avoid conflicts
 
 **Smoke Tests**: ✅ (3/3 passing)
 - Config load tests with defaults and environment variables ✅
@@ -591,7 +688,7 @@ RUN chown -R appuser:appgroup /app
 USER appuser
 
 # Expose ports
-EXPOSE 8086 9096
+EXPOSE 8080 50051
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
@@ -616,7 +713,7 @@ docker build -f market-data-simulator-go/Dockerfile -t market-data-simulator:lat
 docker images market-data-simulator:latest
 
 # Test run
-docker run --rm -p 8086:8086 -p 9096:9096 \
+docker run --rm -p 8085:8080 -p 50055:50051 \
   -e POSTGRES_URL="postgres://market_data_adapter:market-data-adapter-db-pass@host.docker.internal:5432/trading_ecosystem" \
   -e REDIS_URL="redis://market-data-adapter:market-data-pass@host.docker.internal:6379/0" \
   market-data-simulator:latest

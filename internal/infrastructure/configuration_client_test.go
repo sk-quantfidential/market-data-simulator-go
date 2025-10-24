@@ -19,8 +19,8 @@ func setupConfigurationClient() (*ConfigurationClient, *httptest.Server) {
 	cfg := &config.Config{
 		ServiceName:    "market-data-simulator",
 		ServiceVersion: "1.0.0",
-		GRPCPort:      9090,
-		HTTPPort:      8080,
+		GRPCPort:       50051,
+		HTTPPort:       8080,
 	}
 
 	logger := logrus.New()

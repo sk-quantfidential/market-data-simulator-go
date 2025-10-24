@@ -15,6 +15,7 @@ import (
 	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/config"
 	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/handlers"
 	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/infrastructure"
+	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/infrastructure/observability"
 	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/proto"
 	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/services"
 )
@@ -94,7 +95,23 @@ func setupHTTPServer(cfg *config.Config, marketDataService *services.MarketDataS
 	router := gin.New()
 	router.Use(gin.Recovery())
 
+	// Initialize observability (Clean Architecture: port + adapter)
+	constantLabels := map[string]string{
+		"service":  cfg.ServiceName,
+		"instance": cfg.ServiceInstanceName,
+		"version":  cfg.ServiceVersion,
+	}
+	metricsPort := observability.NewPrometheusMetricsAdapter(constantLabels)
+
+	// Add RED metrics middleware (Rate, Errors, Duration)
+	router.Use(observability.REDMetricsMiddleware(metricsPort))
+
+	// Initialize handlers
 	healthHandler := handlers.NewHealthHandlerWithConfig(cfg, logger)
+	metricsHandler := handlers.NewMetricsHandler(metricsPort)
+
+	// Observability endpoints (separate from business logic)
+	router.GET("/metrics", metricsHandler.Metrics)
 
 	v1 := router.Group("/api/v1")
 	{

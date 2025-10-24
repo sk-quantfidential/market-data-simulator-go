@@ -496,7 +496,7 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates tzdata
 COPY --from=builder /app/market-data-simulator /usr/local/bin/
 COPY --from=builder /app/config/config.yaml /etc/market-data/
-EXPOSE 8082 50053
+EXPOSE 8080 50051
 CMD ["market-data-simulator", "--config=/etc/market-data/config.yaml"]
 ```
 

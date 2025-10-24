@@ -24,10 +24,10 @@ func setupTestServer(t *testing.T) (*MarketDataGRPCServer, *bufconn.Listener, fu
 	cfg := &config.Config{
 		ServiceName:    "market-data-simulator",
 		ServiceVersion: "1.0.0",
-		GRPCPort:      9090,
-		HTTPPort:      8080,
-		LogLevel:      "info",
-		RedisURL:      "redis://localhost:6379",
+		GRPCPort:       50051,
+		HTTPPort:       8080,
+		LogLevel:       "info",
+		RedisURL:       "redis://localhost:6379",
 	}
 
 	logger := logrus.New()
@@ -62,7 +62,7 @@ func TestMarketDataGRPCServer_Creation(t *testing.T) {
 	cfg := &config.Config{
 		ServiceName:    "market-data-simulator",
 		ServiceVersion: "1.0.0",
-		GRPCPort:      9090,
+		GRPCPort:       50051,
 	}
 
 	logger := logrus.New()

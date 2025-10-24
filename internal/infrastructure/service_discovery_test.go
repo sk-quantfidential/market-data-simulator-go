@@ -17,9 +17,9 @@ func setupServiceDiscovery() (*ServiceDiscovery, func()) {
 	cfg := &config.Config{
 		ServiceName:    "market-data-simulator",
 		ServiceVersion: "1.0.0",
-		GRPCPort:      9090,
-		HTTPPort:      8080,
-		RedisURL:      "redis://localhost:6379",
+		GRPCPort:       50051,
+		HTTPPort:       8080,
+		RedisURL:       "redis://localhost:6379",
 	}
 
 	logger := logrus.New()
@@ -75,7 +75,7 @@ func TestServiceDiscovery_Creation(t *testing.T) {
 	assert.Equal(t, "1.0.0", reg.ServiceVersion)
 	assert.NotEmpty(t, reg.InstanceID)
 	assert.Equal(t, 8080, reg.HTTPPort)
-	assert.Equal(t, 9090, reg.GRPCPort)
+	assert.Equal(t, 50051, reg.GRPCPort)
 	assert.Equal(t, "healthy", reg.Health)
 	assert.Equal(t, "active", reg.Status)
 	assert.Contains(t, reg.Tags, "market-data")
@@ -291,7 +291,7 @@ func TestGetServiceEndpoint(t *testing.T) {
 	service := &ServiceInfo{
 		Address:  "localhost",
 		Port:     8080,
-		GRPCPort: 9090,
+		GRPCPort: 50051,
 		HTTPPort: 8080,
 	}
 
@@ -301,7 +301,7 @@ func TestGetServiceEndpoint(t *testing.T) {
 
 	// Test gRPC endpoint
 	endpoint = GetServiceEndpoint(service, "grpc")
-	assert.Equal(t, "localhost:9090", endpoint)
+	assert.Equal(t, "localhost:50051", endpoint)
 
 	// Test default endpoint
 	endpoint = GetServiceEndpoint(service, "tcp")
@@ -312,7 +312,7 @@ func TestGetServiceEndpoint(t *testing.T) {
 	assert.Equal(t, "http://localhost:8080", endpoint)
 
 	endpoint = GetServiceEndpoint(service, "GRPC")
-	assert.Equal(t, "localhost:9090", endpoint)
+	assert.Equal(t, "localhost:50051", endpoint)
 }
 
 // Integration tests (require Redis)
