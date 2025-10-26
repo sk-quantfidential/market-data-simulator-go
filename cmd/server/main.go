@@ -11,12 +11,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 
 	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/config"
 	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/handlers"
 	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/infrastructure"
 	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/infrastructure/observability"
+	connectpresentation "github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/presentation/connect"
 	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/proto"
+	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/proto/protoconnect"
 	"github.com/quantfidential/trading-ecosystem/market-data-simulator-go/internal/services"
 )
 
@@ -95,6 +99,21 @@ func setupHTTPServer(cfg *config.Config, marketDataService *services.MarketDataS
 	router := gin.New()
 	router.Use(gin.Recovery())
 
+	// Add CORS middleware for Connect protocol (browser requests)
+	router.Use(func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Connect-Protocol-Version, Connect-Timeout-Ms, X-Client, X-Client-Version")
+		c.Header("Access-Control-Expose-Headers", "Connect-Protocol-Version")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
+
+		c.Next()
+	})
+
 	// Initialize observability (Clean Architecture: port + adapter)
 	constantLabels := map[string]string{
 		"service":  cfg.ServiceName,
@@ -109,6 +128,10 @@ func setupHTTPServer(cfg *config.Config, marketDataService *services.MarketDataS
 	// Initialize handlers
 	healthHandler := handlers.NewHealthHandlerWithConfig(cfg, logger)
 	metricsHandler := handlers.NewMetricsHandler(metricsPort)
+	marketDataHandler := handlers.NewMarketDataGRPCHandler(cfg, marketDataService, logger)
+
+	// Register Connect protocol handlers
+	registerConnectHandlers(router, marketDataHandler, logger)
 
 	// Observability endpoints (separate from business logic)
 	router.GET("/metrics", metricsHandler.Metrics)
@@ -119,9 +142,24 @@ func setupHTTPServer(cfg *config.Config, marketDataService *services.MarketDataS
 		v1.GET("/ready", healthHandler.Ready)
 	}
 
+	// Enable HTTP/2 support for Connect protocol
 	return &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.HTTPPort),
-		Handler: router,
+		Handler: h2c.NewHandler(router, &http2.Server{}),
 	}
+}
+
+// registerConnectHandlers registers Connect protocol handlers for browser clients
+func registerConnectHandlers(router *gin.Engine, marketDataHandler *handlers.MarketDataGRPCHandler, logger *logrus.Logger) {
+	// Create Connect adapter
+	connectAdapter := connectpresentation.NewMarketDataConnectAdapter(marketDataHandler)
+
+	// Generate Connect HTTP handler
+	path, handler := protoconnect.NewMarketDataServiceHandler(connectAdapter)
+
+	// Register with Gin router (handle all methods under the path)
+	router.Any(path+"*method", gin.WrapH(handler))
+
+	logger.WithField("path", path).Info("Registered Connect protocol handlers for MarketDataService")
 }
 
