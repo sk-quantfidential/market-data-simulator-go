@@ -161,4 +161,10 @@
 # docs/api/**
 # docs/reference/**
 
+## Project-Specific Exceptions
+
+# Proto directory - separate repository with its own validation
+proto/**
+proto/
+
 # End of template

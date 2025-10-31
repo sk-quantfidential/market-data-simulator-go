@@ -1,8 +1,9 @@
 module github.com/quantfidential/trading-ecosystem/market-data-simulator-go
 
-go 1.24
+go 1.24.0
 
 require (
+	connectrpc.com/connect v1.19.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang/protobuf v1.5.4
 	github.com/joho/godotenv v1.5.1
@@ -11,8 +12,9 @@ require (
 	github.com/redis/go-redis/v9 v9.15.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.11.1
+	golang.org/x/net v0.46.0
 	google.golang.org/grpc v1.75.1
-	google.golang.org/protobuf v1.36.8
+	google.golang.org/protobuf v1.36.9
 )
 
 require (
@@ -47,10 +49,9 @@ require (
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.41.0 // indirect
-	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/sys v0.35.0 // indirect
-	golang.org/x/text v0.28.0 // indirect
+	golang.org/x/crypto v0.43.0 // indirect
+	golang.org/x/sys v0.37.0 // indirect
+	golang.org/x/text v0.30.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250707201910-8d1bb00bc6a7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

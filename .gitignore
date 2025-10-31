@@ -69,6 +69,5 @@ logs/
 .claude-defaults/
 .claude/
 .claude_*
-.gitmodules
 CLAUDE.md
 proto/
