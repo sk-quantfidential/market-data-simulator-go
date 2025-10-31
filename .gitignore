@@ -71,3 +71,4 @@ logs/
 .claude_*
 CLAUDE.md
 proto/
+.gitmodules

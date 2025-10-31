@@ -19,6 +19,28 @@ This PR completes the **config layer integration** of market-data-simulator-go w
 
 ---
 
+## What Changed
+
+### market-data-simulator-go
+
+**Config Layer Integration**:
+- Added DataAdapter field to Config struct
+- Implemented InitializeDataAdapter(ctx, logger) method
+- Implemented GetDataAdapter() accessor method
+- Environment configuration for PostgreSQL and Redis
+
+**Dependencies**:
+- Integrated market-data-adapter-go package
+- Added replace directive for local development
+- Updated go.mod and go.sum
+
+**Graceful Degradation**:
+- Stub mode when infrastructure unavailable
+- Smoke tests passing (connection verification)
+- Ready for TSE-0001.5 service layer integration
+
+---
+
 ## 📋 Changes Overview
 
 ### Phase 1: Config Layer Integration (Task 2)
